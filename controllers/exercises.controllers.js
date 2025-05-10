@@ -61,7 +61,20 @@ const updateExercise = asyncHandler(async (req, res) => {
 
 const getExercisesByUser = asyncHandler(async (req, res) => {
   const { userId } = req.params;
+  const ttl=300
 
+  // Check if the exercises are already cached in Redis
+  const cachedData = await client.get(`exercises:${userId}`);
+  
+  if (cachedData) {
+    // If data is found in cache, return the cached data
+    console.log("Cache hit");
+    return res
+      .status(200)
+      .json(new ApiResponse(200, JSON.parse(cachedData), "Exercises fetched from cache"));
+  }
+
+  // If data is not in cache, fetch it from the database
   const exercises = await Exercise.find({ userId });
 
   if (!exercises || exercises.length === 0) {
@@ -70,11 +83,13 @@ const getExercisesByUser = asyncHandler(async (req, res) => {
       .json(new ApiResponse(404, null, "No exercises found for this user"));
   }
 
+  // Cache the fetched data in Redis with a TTL of 1 hour (3600 seconds)
+  await client.set(`exercises:${userId}`, JSON.stringify(exercises), 'EX', ttl);
+
   return res
     .status(200)
     .json(new ApiResponse(200, exercises, "Exercises fetched successfully"));
 });
-
 
 const getExercisesByUserAndDay = asyncHandler(async (req, res) => {
   const { userId, day } = req.params;
