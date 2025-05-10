@@ -2,7 +2,7 @@ import { createClient } from "redis";
 import dotenv from "dotenv";
 dotenv.config();
 
-if (!process.env.REDIS_URI_EXTERNAL) {
+if (!process.env.REDIS_URI_INTERNAL) {
   throw new Error("REDIS_URI_EXTERNAL is not defined");
 }
 
