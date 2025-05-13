@@ -12,9 +12,9 @@ router.route("/test").get((req, res) => {
 //routes for exercises
 router.route("/:userId/add").post(addExercise)
 
-router.route("/:userId/delete/:id").delete(authmiddleware,deleteExercise)
+router.route("/:userId/delete/:id").delete(deleteExercise)
 
-router.route("/:userId/update/:id").put(authmiddleware,updateExercise)
+router.route("/:userId/update/:id").put(updateExercise)
 
 router.route("/getallbyuser/:userId").get(getExercisesByUser);
 router.route("/getallbyuserandday/:userId/:day").get(getExercisesByUserAndDay)

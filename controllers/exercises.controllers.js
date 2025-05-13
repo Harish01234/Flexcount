@@ -22,15 +22,20 @@ const addExercise = asyncHandler(async (req, res) => {
   return res.status(201).json(new ApiResponse(201, exercise, "Exercise added successfully"));
 });
 
-
 const deleteExercise = asyncHandler(async (req, res) => {
-  const { id, userId } = req.params;
-  const exercise = await Exercise.findByIdAndDelete(id);
+  const { id } = req.params; // Remove userId from destructuring
+
+  const exercise = await Exercise.findById(id);
+
   if (!exercise) {
     return res.status(404).json(new ApiResponse(404, null, "Exercise not found"));
   }
 
-   const cached=await redisccacher(userId);
+  await Exercise.findByIdAndDelete(id);
+
+  // Use exercise.userId instead of req.params.userId
+  await redisccacher(exercise.userId);
+
   return res.status(200).json(new ApiResponse(200, exercise, "Exercise deleted successfully"));
 });
 
